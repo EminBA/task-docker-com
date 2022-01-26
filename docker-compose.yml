@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:12.3
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB}
+      - POSTGRES_USER=${USR}
+      - POSTGRES_PASSWORD=${PASSWORD}
+    container_name: postgres_db
+
+  app:
+    build: .   # dockerfile exists to support the build
+    restart: on-failure
+    volumes:
+      - .:/django
+    ports:
+      - 8000:8000
+    image: app:django
+    container_name: django_container
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - db
+
+  redis:
+    image: redis:3.2
+    container_name: redis
+
